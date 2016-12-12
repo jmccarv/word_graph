@@ -50,6 +50,7 @@ sub parse_puzzle {
     while (<>) {
         chomp;
         next if /^\s*$/;
+        next if /^\s*#/;
 
         my $c = 0;
 
