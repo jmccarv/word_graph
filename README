@@ -1,0 +1,69 @@
+word_graph - very simple program to find all distinct paths in a graph that
+             spell out a word.
+
+This "project" started when my wife brought home a puzzle from her work place,
+which asked how many different ways you could spell the word LEVEL given the
+following:
+
+                                   L-E-V-E-L
+                                   |\ / \ /|
+                                   E E   E E
+                                   |/ \ / \|
+                                   V   V   V
+                                   |\ / \ /|
+                                   E E   E E
+                                   |/ \ / \|
+                                   L-E-V-E-L
+
+I initially found the answer by hand, which is tedious. Why not let a
+computer find the answer for me :)
+
+Take even a simple example like this:
+
+                                     B-O-B
+                                     |\ /|
+                                     O O O
+                                     |/ \|
+                                     B-O-B
+
+There are 32 different paths that can be taken to spell 'BOB'. These paths
+can be found and listed with this program. Try this:
+
+./word_graph.pl bob.dat
+
+09:04:20 slam@monkey ~/src/hg/word_graph $ ./word_graph.pl bob.dat 
+B[0,0]-O[0,2]-B[0,0]
+B[0,0]-O[0,2]-B[0,4]
+B[0,0]-O[2,0]-B[0,0]
+B[0,0]-O[2,0]-B[4,0]
+B[0,0]-O[2,2]-B[0,0]
+B[0,0]-O[2,2]-B[0,4]
+B[0,0]-O[2,2]-B[4,0]
+B[0,0]-O[2,2]-B[4,4]
+B[0,4]-O[0,2]-B[0,0]
+B[0,4]-O[0,2]-B[0,4]
+B[0,4]-O[2,2]-B[0,0]
+B[0,4]-O[2,2]-B[0,4]
+B[0,4]-O[2,2]-B[4,0]
+B[0,4]-O[2,2]-B[4,4]
+B[0,4]-O[2,4]-B[0,4]
+B[0,4]-O[2,4]-B[4,4]
+B[4,0]-O[2,0]-B[0,0]
+B[4,0]-O[2,0]-B[4,0]
+B[4,0]-O[2,2]-B[0,0]
+B[4,0]-O[2,2]-B[0,4]
+B[4,0]-O[2,2]-B[4,0]
+B[4,0]-O[2,2]-B[4,4]
+B[4,0]-O[4,2]-B[4,0]
+B[4,0]-O[4,2]-B[4,4]
+B[4,4]-O[2,2]-B[0,0]
+B[4,4]-O[2,2]-B[0,4]
+B[4,4]-O[2,2]-B[4,0]
+B[4,4]-O[2,2]-B[4,4]
+B[4,4]-O[2,4]-B[0,4]
+B[4,4]-O[2,4]-B[4,4]
+B[4,4]-O[4,2]-B[4,0]
+B[4,4]-O[4,2]-B[4,4]
+32 distinct paths found that spell 'BOB'
+
+The top-left column of the graph is location row 0 column 0, displayed as [0,0]
