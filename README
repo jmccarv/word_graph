@@ -29,9 +29,7 @@ Take even a simple example like this:
 There are 32 different paths that can be taken to spell 'BOB'. These paths
 can be found and listed with this program. Try this:
 
-./word_graph.pl bob.dat
-
-09:04:20 slam@monkey ~/src/hg/word_graph $ ./word_graph.pl bob.dat 
+./word_graph.pl bob.dat 
 B[0,0]-O[0,2]-B[0,0]
 B[0,0]-O[0,2]-B[0,4]
 B[0,0]-O[2,0]-B[0,0]
