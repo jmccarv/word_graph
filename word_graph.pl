@@ -67,7 +67,7 @@ sub parse_puzzle {
                     my $ofs = $dir{$char};
                     my $from_row = $r + $ofs->[0];
                     my $from_col = $c + $ofs->[1];
-                    next unless $from_row >= 0 && $from_col >= 0;
+                    next if $from_row < 0 || $from_col < 0;
 
                     my $from_node = $puzzle_nodes[$from_row]->[$from_col];
                     next unless $from_node;
