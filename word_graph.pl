@@ -113,13 +113,12 @@ sub search {
     my ($opts, $g, @path) = @_;
     my @found = ();
 
-
     return \@path if $opts->{word} eq join('', map{ $_->{char} } @path);
 
     my $next = substr($opts->{word}, @path, 1) or return ();
 
     push @found, search($opts, $g, @path, $_)
-        for ( grep { $_->{char} eq $next } $g->successors($path[$#path]) );
+        for ( grep { $_->{char} eq $next } $g->successors($path[-1]) );
 
     @found;
 }
