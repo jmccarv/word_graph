@@ -89,24 +89,6 @@ sub parse_puzzle {
     (\%opts, \@puzzle_nodes, $g);
 }
 
-sub virtex_sort {
-    $a->{idx} <=> $b->{idx};
-}
-
-sub edge_sort {
-    my $va = $a->[0]->{idx} <= $a->[1]->{idx} ? $a->[0] : $a->[1];
-    my $vb = $b->[0]->{idx} <= $b->[1]->{idx} ? $b->[0] : $b->[1];
-
-    $va->{idx} <=> $vb->{idx};
-}
-
-sub print_graph {
-    my $g = shift;
-    for my $e (sort edge_sort $g->edges) {
-        printf("%s-%s\n", node_id($e->[0]), node_id($e->[1]));
-    }
-}
-
 sub node_id {
     my $n = shift;
     sprintf("%s[%d,%d]", $n->{char}, $n->{r}, $n->{c});
@@ -141,3 +123,23 @@ sub search {
 
     @found;
 }
+
+
+sub virtex_sort {
+    $a->{idx} <=> $b->{idx};
+}
+
+sub edge_sort {
+    my $va = $a->[0]->{idx} <= $a->[1]->{idx} ? $a->[0] : $a->[1];
+    my $vb = $b->[0]->{idx} <= $b->[1]->{idx} ? $b->[0] : $b->[1];
+
+    $va->{idx} <=> $vb->{idx};
+}
+
+sub print_graph {
+    my $g = shift;
+    for my $e (sort edge_sort $g->edges) {
+        printf("%s-%s\n", node_id($e->[0]), node_id($e->[1]));
+    }
+}
+
