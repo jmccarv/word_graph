@@ -20,7 +20,12 @@ sub main {
    my $y = 0;
 
    for( $y = 0; $y < $word_len; ++$y ){
-      printLetters( $y, @letters );
+
+      if( $y % 2 == 0 ){
+         printLetters( $y, 'short', @letters );
+      } else {
+         printLetters( $y, 'long', @letters );
+      }
       if( $y+1 != $word_len){
          if( $y % 2 == 0 ){
             printContractPaths( $word_len );
@@ -33,18 +38,51 @@ sub main {
 }
 
 sub printLetters {
-   my ($index, @letters) = @_;
+   my ($y, $row_style, @letters) = @_;
 
    my $x = 0;
+   my $row_len = (@letters);
+   my $middle = (@letters)/2+1;
+   my $letter = '';
 
-   if( $index == 0 or $index == (@letters)-1 ){
-      foreach my $letter (@letters) {
+   # The first and last rows
+   if( $y == 0 or $y == (@letters)-1 ){
+      foreach $letter (@letters) {
          if( $x != 0 ){ print "-"; }
          print "$letter";
          ++$x;
       }
-   }
+   } else {
+      # It's a middle row, now long or short
 
+      if( $row_style eq 'long' ){
+
+         $row_len = int((@letters)/2)+2;
+         $letter = $letters[$y];
+         for( $x = 0; $x < $row_len; ++$x ){
+            if( $x == 0 or $x+2 == $row_len  ){
+               print "$letter ";
+            } elsif( $x+1 != $row_len ){
+               print "$letter   ";
+            } else {
+               print "$letter";
+            }
+         }
+
+      } else {
+
+         $row_len = int((@letters)/2)+1;
+         $letter = $letters[$y];
+         for( $x = 0; $x < $row_len; ++$x ){
+            if( $x+1 != $row_len ){
+               print "$letter   ";
+            } else {
+               print "$letter";
+            }
+         }
+      }
+
+   }
    print "\n";
 }
 
