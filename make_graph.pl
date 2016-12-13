@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use Math::Cephes;
-
 exit main();
 
 sub main {
@@ -30,7 +28,6 @@ sub main {
    print "word = $word\n\n";
 
    my @letters = split('',$word);
-   my $x = 0;
    my $y = 0;
 
    my $graph_stats = {
@@ -54,17 +51,21 @@ sub main {
       }
    }
 
-   my $worst_case = ($graph_stats->{verts} * $graph_stats->{edges} ) / 2;
-   my $upper_bound = $graph_stats->{verts} * $word_len;
-   my $max_capacity = 2 * $graph_stats->{edges} * (log($word_len)/log(2));
+   my $pockets      = 2-($graph_stats->{verts} - $graph_stats->{edges});
 
    print "\n# Edges:       $graph_stats->{edges}\n";
    print "# Vertices:    $graph_stats->{verts}\n";
+   print "# Pockets:     $pockets\n";
    print "# Word Length: $word_len\n";
-   print "# Worst Case:  $worst_case\n";
-   print "# Upper Bound: $upper_bound\n";
-   print "# Capacity:    $max_capacity\n\n";
 
+   # TODO: Solve this seemingly NP-Hard (maybe NP-Coplete) stuff for said planar graph
+   #my $worst_case   = ($graph_stats->{verts} * $graph_stats->{edges} ) / 2;
+   #my $upper_bound  = $graph_stats->{verts} * $word_len;
+   #my $max_capacity = 2 * $graph_stats->{edges} * (log($word_len)/log(2));
+   #print "# Worst Case:  $worst_case\n";
+   #print "# Upper Bound: $upper_bound\n";
+   #print "# Capacity:    $max_capacity\n";
+   print "\n";
 }
 
 sub printLetters {
