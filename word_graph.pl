@@ -1,8 +1,15 @@
 #!/usr/bin/env perl
 
 use Graph::Undirected;
+use File::Spec;
+use Getopt::Long;
 use strict;
 use warnings;
+
+use v5.14;
+no warnings 'experimental::smartmatch';
+
+my $me = (File::Spec->splitpath($0))[2];
 
 my %dir = (
     '-'  => [  0, -1 ],
@@ -13,40 +20,84 @@ my %dir = (
 
 exit main();
 
-sub main {
-    my @paths;
-    my ($opts, $puzzle_nodes, $g) = parse_puzzle();
+sub usage {
+    print STDERR @_,"\n" if @_;
 
-    return unless $opts->{word};
-    my $first_letter = substr($opts->{word},0,1);
+    print STDERR <<EOT;
+usage: $me [OPTIONS] [FILE]
 
-    push @paths, search($opts, $g, $_) 
-        for grep { $_->{char} eq $first_letter } $g->vertices;
+Solve the word graph (see accompying README) in
+FILE (or read from stdin if no FILE specified)
 
-    print join ('-', map { node_id($_) } @$_), "\n"
-        for sort path_sort @paths;
+OPTIONS:
+ -h, -?, --help     this help
+ -o, --out <style>  what results to output, one of:
+                    'list' or 'count',  default = count
+ -w, --word         word to look for in graph 
+                    (usually embedded in input file)
 
-    print @paths." distinct paths found that spell '".$opts->{word}."'\n";
+The above options may be set in the word graph FILE using the syntax
+option = value. One setting per line, like so:
+
+# comment lines start with '#'
+# blank lines are ignored
+word = BOB
+visualize = 1
+
+B-O-B
+|\ /|
+O O O
+|/ \|
+B-O-B
+EOT
+
+    exit 1;
 }
 
-sub path_sort {
-    my @nb = @$b;
-    for my $na (@$a) {
-        my $nb = shift @nb;
-        next if $na->{idx} == $nb->{idx};
-        return $na->{idx} <=> $nb->{idx};
-    }
+sub main {
+    my @paths;
+    my $opts = getopts();
+
+    my ($puzzle_nodes, $g) = parse_puzzle($opts);
+
+    usage 'No word (-w) given to solve'
+        unless $opts->{word};
+
+    my $first_letter = substr($opts->{word},0,1);
+
+    search($opts, $g, $_) 
+        for grep { $_->{char} eq $first_letter } $g->vertices;
+
+    printf "%d distinct path(s) found that spell '%s'\n", ($opts->{path_count} // 0), $opts->{word}
+        if $opts->{out} eq 'count';
+
     0;
 }
 
-sub parse_puzzle {
+sub getopts {
     my %opts;
+
+    $opts{out} = 'count';
+
+    GetOptions(
+        \%opts,
+        'help|h|?',
+        'out|o=s',
+        'word|w=s',
+    ) or usage();
+
+    usage() if $opts{help};
+
+    \%opts;
+}
+
+sub parse_puzzle {
+    my $opts = shift;
     my @puzzle_nodes;
 
     my $g = Graph::Undirected->new(refvertexed => 1);
 
     my $r = 0;
-    my $idx = 0;
     while (<>) {
         chomp;
         next if /^\s*$/;
@@ -55,13 +106,13 @@ sub parse_puzzle {
         my $c = 0;
 
         if (/\s*(.*?)\s*=\s*(.*?)\s*$/) {
-            $opts{$1} = $2;
+            $opts->{$1} //= $2;
 
         } else {
             my @line = split //, $_;
 
             for my $char (@line) {
-                my $node = { char => $char, r => $r, c => $c, idx => $idx++ };
+                my $node = { char => $char, r => $r, c => $c };
                 $puzzle_nodes[$r]->[$c] = $node;
 
                 if ($dir{$char}) {
@@ -85,9 +136,7 @@ sub parse_puzzle {
         }
     }
 
-    #print_graph($g);
-    #print Dumper(\@puzzle_nodes);
-    (\%opts, \@puzzle_nodes, $g);
+    (\@puzzle_nodes, $g);
 }
 
 sub node_id {
@@ -112,34 +161,30 @@ sub add_edges {
 
 sub search {
     my ($opts, $g, @path) = @_;
-    my @found = ();
 
-    return \@path if $opts->{word} eq join('', map{ $_->{char} } @path);
+    if ($opts->{word} eq join('', map{ $_->{char} } @path)) {
+        display_path($opts, \@path);
+        return;
+    }
 
     my $next = substr($opts->{word}, @path, 1) or return ();
 
-    push @found, search($opts, $g, @path, $_)
+    search($opts, $g, @path, $_)
         for ( grep { $_->{char} eq $next } $g->successors($path[-1]) );
-
-    @found;
 }
 
 
-sub virtex_sort {
-    $a->{idx} <=> $b->{idx};
-}
+sub display_path {
+    my $opts = $_[0];
 
-sub edge_sort {
-    my $va = $a->[0]->{idx} <= $a->[1]->{idx} ? $a->[0] : $a->[1];
-    my $vb = $b->[0]->{idx} <= $b->[1]->{idx} ? $b->[0] : $b->[1];
-
-    $va->{idx} <=> $vb->{idx};
-}
-
-sub print_graph {
-    my $g = shift;
-    for my $e (sort edge_sort $g->edges) {
-        printf("%s-%s\n", node_id($e->[0]), node_id($e->[1]));
+    for ($opts->{out}) {
+        disp_stdout(@_) when 'list';
+        default         { ++$opts->{path_count} }
     }
 }
 
+sub disp_stdout {
+    my ($opts, $path) = @_;
+
+    print join ('-', map { node_id($_) } @$path), "\n"
+}
