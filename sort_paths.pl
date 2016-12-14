@@ -6,39 +6,27 @@ use warnings;
 # Could probably be faster...
 
 my @paths;
+
+# Assume the output is being piped from word_graph.pl into
+# this script, it makes sense to word during this loop that
+# will save us time during the sort later
 while (<>) {
     next unless /.\[\d+,\d+\]/;
 
     chomp;
+    my @vertices = split '-', $_;
 
-    push @paths, [ split '-', $_ ];
+    push @paths, [ map { m/(\d+),(\d+)/; [ $1*@vertices + $2, $_ ] } @vertices ];
 }
 
-print join ('-', @$_), "\n"
+print join ('-', map { $_->[1] } @$_), "\n"
     for sort path_sort @paths;
 
 sub path_sort {
-    my $cmp = 0;
-
     for my $i ( 0..$#$a ) {
-        next unless $cmp = compare_locations($a->[$i], $b->[$i]);
-        return $cmp;
+        next if $a->[$i]->[0] ==  $b->[$i]->[0];
+        return  $a->[$i]->[0] <=> $b->[$i]->[0];
     }
 
     0;
-}
-
-sub compare_locations {
-    my ($a, $b) = @_;
-
-    $a =~ /(\d+),(\d+)/;
-    my @a = ($1, $2);
-
-    $b =~ /(\d+),(\d+)/;
-    my @b = ($1, $2);
-
-    return $a[0] <=> $b[0]
-        unless $a[0] == $b[0];
-
-    $a[1] <=> $b[1];
 }
