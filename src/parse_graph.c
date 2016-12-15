@@ -20,7 +20,7 @@ void parse_assignment(graph_t *graph, char *start, char *delim) {
         if (delim > start) {
             graph->word     = strdup(start);
             graph->word_len = strlen(graph->word);
-            graph->line_len = graph->max_c = graph->word_len * 2 - 1;
+            graph->line_len = graph->nr_cols = graph->word_len * 2 - 1;
         }
     }
 }
@@ -92,7 +92,7 @@ graph_t *parse_graph (FILE *fh, const char *word) {
         }
 
         graph_add_line(graph, graph_line);
-        ++graph->max_r;
+        ++graph->nr_rows;
     }
 
     if (empty_line) graph_add_line(graph, empty_line);

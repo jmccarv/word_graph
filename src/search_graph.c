@@ -19,8 +19,8 @@ void find_paths (graph_t *graph, int print_paths) {
 
     path = xzmalloc(sizeof(position_t) * graph->word_len, '\0');
 
-    for (r=1; r <= graph->max_r; r++) {
-        for (c=1; c <= graph->max_c; c++) {
+    for (r=1; r <= graph->nr_rows; r++) {
+        for (c=1; c <= graph->nr_cols; c++) {
             path[0].r = r;
             path[0].c = c;
             nr_paths += descend(graph, path, 0, print_paths);
@@ -28,7 +28,7 @@ void find_paths (graph_t *graph, int print_paths) {
     }
 
     if (!print_paths)
-        printf ("Found %"PRIu64" paths\n", nr_paths);
+        printf ("Found %"PRIu64" paths that spell '%s'\n", nr_paths, graph->word);
 }
 
 void print_path (graph_t *graph, position_t *path) {
