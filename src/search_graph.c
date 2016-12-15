@@ -9,9 +9,9 @@ typedef struct position {
     char edge;
 } position_t;
 
-position_t ofs[8] = { {-1,-1,'\\'}, {-1, 0,'|'}, {-1,1,'/'}, {0,-1,'-'}, {0,1,'-'}, {1,-1,'/'}, {1,0,'|'}, {1,1,'\\'} };
+position_t ofs[8] = { {-1,-1,'\\'}, {-1,0,'|'}, {-1,1,'/'}, {0,-1,'-'}, {0,1,'-'}, {1,-1,'/'}, {1,0,'|'}, {1,1,'\\'} };
 
-uint64_t descend    (graph_t *graph, position_t *path, int word_ofs, int print_paths);
+uint64_t descend (graph_t *graph, position_t *path, int word_ofs, int print_paths);
 
 void find_paths (graph_t *graph, int print_paths) {
     int r,c;
