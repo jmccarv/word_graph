@@ -1,8 +1,6 @@
 #include <ctype.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "word_graph.h"
 #include "parse_graph.h"

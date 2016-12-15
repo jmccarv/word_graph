@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <inttypes.h>
 #include "parse_graph.h"
 #include "util.h"
