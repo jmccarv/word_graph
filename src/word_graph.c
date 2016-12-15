@@ -21,7 +21,7 @@ void usage (int rc) {
            "OPTIONS:\n"
            " -?        this help\n"
            " -l        list paths instead of count\n"
-           " -w <word> word to search for (usually embedded in input file\n"
+           " -w <word> word to search for (usually embedded in input file)\n"
     );
 
     exit(rc);
