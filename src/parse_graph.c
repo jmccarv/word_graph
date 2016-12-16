@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "word_graph.h"
 #include "parse_graph.h"
 #include "util.h"
-#include "_word_graph.h"
 
 void parse_assignment(graph_t *graph, char *start, char *delim) {
     *delim='\0';

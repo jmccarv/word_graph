@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "word_graph.h"
+
+#include "path_util.h"
 #include "util.h"
 
 /*  we're imposing a limit of 256x256 graph, so deal with it
@@ -79,12 +80,6 @@ int path_compare (const void *a, const void *b) {
 void add_path (char *line) {
     path_t *path;
 
-    char *p = line;
-    char *q;
-    char *z;
-    cell_t *cell;
-
-
     if ( nr_paths == alloc_paths ) {
         alloc_paths += NR_ALLOC;
         paths = xrealloc(paths, sizeof(path_t) * alloc_paths);
@@ -92,51 +87,5 @@ void add_path (char *line) {
     path = paths + nr_paths;
     nr_paths++;
 
-
-    path->nr_cells = 1;
-    for (; (p = strchr(p, '-')); path->nr_cells++, p++);
-
-    cell = path->cells = xzmalloc(sizeof(cell_t) * path->nr_cells, '\0');
-
-
-    /* Line will be a '-' separated list of cells, where each cell will
-     * look like C[#,#] where C is a character and # is a number 
-     * between 0 and 255
-     */
-
-    p = q = line;
-    //printf("Enter line: %s\n", line);
-    while (p) {
-        //printf("Top of loop\n");
-        q = strchr(p, '-');
-        if (q) *q = '\0';
-
-        cell->letter = *p;
-
-        /* Find row number */
-        p+=2;
-        z = strchr(p, ',');
-        if (!z) {
-            fprintf(stderr, "Failed to parse input :(\n");
-            exit(1);
-        }
-        *z = '\0';
-
-        cell->r = atoi(p);
-        p = z+1;
-
-        /* Now find the column number */
-        z = strchr(p, ']');
-        if (!z) {
-            fprintf(stderr, "Failed to parse input :(\n");
-            exit(1);
-        }
-        *z = '\0';
-
-        cell->c = atoi(p);
-        //printf("parsed: %c[%d,%d]\n", cell->letter, cell->r, cell->c);
-
-        p = q ? q+1 : NULL;
-        cell++;
-    }
+    parse_path(line, path);
 }

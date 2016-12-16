@@ -2,15 +2,19 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "word_graph.h"
 #include "parse_graph.h"
 #include "search_graph.h"
 #include "util.h"
-#include "_word_graph.h"
 
-opts_t  opts  = { 0, NULL, NULL };
+typedef struct opts {
+    int  list;
+    char *word;
+    FILE *fh;
+} opts_t;
 
-void get_opts   (int argc, char **argv);
+opts_t opts = { 0, NULL, NULL };
+
+void get_opts (int argc, char **argv);
 
 void usage (int rc) {
     printf("usage: word_graph [OPTIONS] [FILE]\n\n"
