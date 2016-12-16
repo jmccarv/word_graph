@@ -59,6 +59,11 @@ void display_path (graph_t *graph, path_t *path) {
     cell_t *cell;
     cell_t prev;
 
+    attr_t attr_path    = A_STANDOUT;
+    attr_t attr_curcell = A_STANDOUT;
+
+    if (opts.cell_delay > 0) attr_curcell |= A_UNDERLINE;
+
     for (i=0; i < path->nr_cells; i++) {
         cell = path->cells + i;
 
@@ -67,16 +72,22 @@ void display_path (graph_t *graph, path_t *path) {
             prev.r = cell->r + (prev.r - cell->r)/2;
             prev.c = cell->c + (prev.c - cell->c)/2;
 
-            mvchgat(prev.r, prev.c, 1, A_STANDOUT|A_UNDERLINE, 0, NULL);
-            refresh();
-            if (opts.cell_delay > 0) usleep(opts.cell_delay);
-            chgat(1, A_STANDOUT, 0, NULL);
+            mvchgat(prev.r, prev.c, 1, attr_curcell, 0, NULL);
+
+            if (opts.cell_delay > 0) {
+                refresh();
+                usleep(opts.cell_delay);
+                chgat(1, attr_path, 0, NULL);
+            }
         }
 
-        mvchgat(cell->r, cell->c, 1, A_STANDOUT|A_UNDERLINE, 0, NULL);
+        mvchgat(cell->r, cell->c, 1, attr_curcell, 0, NULL);
         refresh();
-        if (opts.cell_delay > 0) usleep(opts.cell_delay);
-        chgat(1, A_STANDOUT, 0, NULL);
+
+        if (opts.cell_delay > 0) {
+            usleep(opts.cell_delay);
+            chgat(1, attr_path, 0, NULL);
+        }
     }
 }
 
