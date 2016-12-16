@@ -66,3 +66,7 @@ B[4,4]-O[4,2]-B[4,0]
 B[4,4]-O[4,2]-B[4,4]
 
 The top-left column of the graph is location row 0 column 0, displayed as [0,0]
+
+
+
+./word_graph -l ../data/level.dat | ./view_paths ../data/level.dat
