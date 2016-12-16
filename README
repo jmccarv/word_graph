@@ -29,7 +29,9 @@ Take even a simple example like this:
 There are 32 different paths that can be taken to spell 'BOB'. These paths
 can be found and listed with this program. Try this:
 
-./word_graph.pl bob.dat 
+cd src
+make
+./word_graph -l ../data/bob.dat 
 B[0,0]-O[0,2]-B[0,0]
 B[0,0]-O[0,2]-B[0,4]
 B[0,0]-O[2,0]-B[0,0]
@@ -62,6 +64,5 @@ B[4,4]-O[2,4]-B[0,4]
 B[4,4]-O[2,4]-B[4,4]
 B[4,4]-O[4,2]-B[4,0]
 B[4,4]-O[4,2]-B[4,4]
-32 distinct paths found that spell 'BOB'
 
 The top-left column of the graph is location row 0 column 0, displayed as [0,0]
