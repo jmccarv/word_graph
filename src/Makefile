@@ -1,8 +1,4 @@
-# $Id$ #
-
 # ---- Compiling ---- #
-
-# CFLAGS += -I/usr/local/include
 
 # Optimization
 CFLAGS += -O2
@@ -15,34 +11,20 @@ CFLAGS += -O2
 #LDFLAGS = 
 
 
-
 # ---- Debugging ---- #
-
-# Include the following to allow debugging messages to stderr
-CFLAGS += -DDEBUG
 
 # Include the following for profiling information
 #
 #CFLAGS += -pg
 #LDFLAGS += -pg
 
-
-# Include the following to link against ElectricFence
-# LDFLAGS += -lefence
-
-# Include the following to link against DUMA (http://duma.sourceforge.net)
-# LDFLAGS += -lduma
-
 # Include the following for debugging output in the binary
-CFLAGS += -g
+# CFLAGS += -g
 
 ### End of user configuration ###
 #################################
 
-CFLAGS  += -Wall -finline-functions -D_GNU_SOURCE
-#CFLAGS  += -Wall -pedantic -Wextra
-
-# LDFLAGS += -lpthread
+CFLAGS += -Wall -finline-functions -D_GNU_SOURCE
 
 objects = util.o
 headers = util.h
@@ -78,4 +60,4 @@ $(vp_objects): $(vp_headers)
 
 .PHONY:		clean
 clean:
-	-rm -f $(objects) $(wg_objects) sort_paths.o view_paths.o word_graph sort_paths view_paths
+	-rm -f $(objects) $(wg_objects) $(sp_objects) $(vp_objects) word_graph sort_paths view_paths
