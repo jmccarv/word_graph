@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "parse_graph.h"
-#include "util.h"
+#include "inc/parse_graph.h"
+#include "inc/util.h"
 
 void parse_assignment(graph_t *graph, char *start, char *delim) {
     *delim='\0';

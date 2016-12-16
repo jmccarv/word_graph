@@ -1,6 +1,7 @@
 #include <inttypes.h>
-#include "parse_graph.h"
-#include "util.h"
+
+#include "inc/parse_graph.h"
+#include "inc/util.h"
 
 typedef struct position {
     int  r;

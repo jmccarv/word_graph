@@ -27,16 +27,16 @@ CFLAGS += -O2
 CFLAGS += -Wall -finline-functions -D_GNU_SOURCE
 
 objects = util.o
-headers = util.h
+headers = inc/util.h
 
 wg_objects = word_graph.o parse_graph.o search_graph.o
-wg_headers = parse_graph.h search_graph.h
+wg_headers = inc/parse_graph.h inc/search_graph.h
 
 sp_objects = sort_paths.o parse_graph.o path_util.o
-sp_headers = parse_graph.h path_util.h
+sp_headers = inc/parse_graph.h inc/path_util.h
 
 vp_objects = view_paths.o parse_graph.o path_util.o
-vp_headers = parse_graph.h path_util.h
+vp_headers = inc/parse_graph.h inc/path_util.h
 
 all:	word_graph sort_paths view_paths
 

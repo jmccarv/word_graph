@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "path_util.h"
-#include "util.h"
+#include "inc/path_util.h"
+#include "inc/util.h"
 
 /*  we're imposing a limit of 256x256 graph, so deal with it
  * input looks like this: C[255,255]-... 

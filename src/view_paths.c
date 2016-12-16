@@ -3,9 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "parse_graph.h"
-#include "path_util.h"
-#include "util.h"
+#include "inc/parse_graph.h"
+#include "inc/path_util.h"
+#include "inc/util.h"
 
 typedef struct opts {
     char  *word;

@@ -2,9 +2,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "parse_graph.h"
-#include "search_graph.h"
-#include "util.h"
+#include "inc/parse_graph.h"
+#include "inc/search_graph.h"
+#include "inc/util.h"
 
 typedef struct opts {
     int  list;
