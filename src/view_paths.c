@@ -57,7 +57,7 @@ void init_board(graph_t *graph) {
 void display_path (graph_t *graph, path_t *path) {
     int i;
     cell_t *cell;
-    cell_t prev;
+    cell_t *prev = NULL;
 
     attr_t attr_path    = A_STANDOUT;
     attr_t attr_curcell = A_STANDOUT;
@@ -67,12 +67,11 @@ void display_path (graph_t *graph, path_t *path) {
     for (i=0; i < path->nr_cells; i++) {
         cell = path->cells + i;
 
-        if (i > 0) {
-            prev = *(cell - 1);
-            prev.r = cell->r + (prev.r - cell->r)/2;
-            prev.c = cell->c + (prev.c - cell->c)/2;
+        if (prev) {
+            prev->r = cell->r + (prev->r - cell->r)/2;
+            prev->c = cell->c + (prev->c - cell->c)/2;
 
-            mvchgat(prev.r, prev.c, 1, attr_curcell, 0, NULL);
+            mvchgat(prev->r, prev->c, 1, attr_curcell, 0, NULL);
 
             if (opts.cell_delay > 0) {
                 refresh();
@@ -88,6 +87,8 @@ void display_path (graph_t *graph, path_t *path) {
             usleep(opts.cell_delay);
             chgat(1, attr_path, 0, NULL);
         }
+
+        prev = cell;
     }
 }
 
