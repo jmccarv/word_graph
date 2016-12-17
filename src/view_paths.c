@@ -68,7 +68,7 @@ void display_path (graph_t *graph, path_t *path) {
         cell = path->cells + i;
 
         if (i > 0) {
-            prev = *(path->cells + i-1);
+            prev = *(cell - 1);
             prev.r = cell->r + (prev.r - cell->r)/2;
             prev.c = cell->c + (prev.c - cell->c)/2;
 
