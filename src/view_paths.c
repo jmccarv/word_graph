@@ -81,15 +81,16 @@ void display_path (graph_t *graph, path_t *path) {
         }
 
         mvchgat(cell->r, cell->c, 1, attr_curcell, 0, NULL);
-        refresh();
 
         if (opts.cell_delay > 0) {
+            refresh();
             usleep(opts.cell_delay);
             chgat(1, attr_path, 0, NULL);
         }
 
         prev = cell;
     }
+    refresh();
 }
 
 int main (int argc, char **argv) {
