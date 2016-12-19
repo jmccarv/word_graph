@@ -5,8 +5,9 @@
 #include "inc/path_util.h"
 #include "inc/util.h"
 
-/*  we're imposing a limit of 256x256 graph, so deal with it
- * input looks like this: C[255,255]-... 
+/* we're imposing a limit of 256x256 graph, so deal with it
+ * input looks like this: C[r,c]-...
+ * where r and c are integer values ranging from 0 - 255
 */
 
 #define MAX_LEN 256
@@ -25,11 +26,15 @@ path_t *parse_path (char *line, path_t *path) {
     char *q;
     char *z;
     cell_t *cell;
+    char cellflag[MAX_LEN][MAX_LEN];
 
     path->cells = NULL;
     path->nr_cells = 0;
+    path->has_cycle = 0;
 
     if (!line) return path;
+
+    memset(cellflag, '\0', sizeof(char) * MAX_LEN * MAX_LEN);
 
     path->nr_cells++;
     for (; (p = strchr(p, '-')); path->nr_cells++, p++);
@@ -72,6 +77,10 @@ path_t *parse_path (char *line, path_t *path) {
 
         cell->c = atoi(p);
         //printf("parsed: %c[%d,%d]\n", cell->letter, cell->r, cell->c);
+
+        //if ( cellflag[cell->r][cell->c]++ )
+        if ( cellflag[(int)cell->r][(int)cell->c]++ )
+            path->has_cycle = 1;
 
         p = q ? q+1 : NULL;
         cell++;

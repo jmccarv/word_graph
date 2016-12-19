@@ -16,6 +16,9 @@ typedef struct opts {
 
 opts_t opts = { NULL, NULL, 50000, 100000 };
 
+static long total_paths;
+static long with_cycles;
+
 void get_opts (int argc, char **argv);
 
 void usage (int rc) {
@@ -58,9 +61,12 @@ void display_path (graph_t *graph, path_t *path) {
     int i;
     cell_t *cell;
     cell_t *prev = NULL;
+    char stat_line[256];
 
     attr_t attr_path    = A_STANDOUT;
     attr_t attr_curcell = A_STANDOUT;
+    total_paths++;
+    if (path->has_cycle) with_cycles++;
 
     if (opts.cell_delay > 0) attr_curcell |= A_UNDERLINE;
 
@@ -90,6 +96,10 @@ void display_path (graph_t *graph, path_t *path) {
 
         prev = cell;
     }
+
+    
+    snprintf(stat_line, 255, "Paths: %ld   With Cycles: %ld", total_paths, with_cycles);
+    mvaddstr(graph->nr_rows, 0, stat_line);
     refresh();
 }
 
@@ -126,6 +136,7 @@ int main (int argc, char **argv) {
     }
 
     endwin();
+    printf("Paths: %ld  With Cycles: %ld\n", total_paths, with_cycles);
     return 0;
 }
 

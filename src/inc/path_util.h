@@ -9,6 +9,7 @@ typedef struct cell {
 
 typedef struct path {
     cell_t *cells;
+    int  has_cycle;
     char nr_cells;
 } path_t;
 
