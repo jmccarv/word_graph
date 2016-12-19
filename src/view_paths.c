@@ -16,8 +16,13 @@ typedef struct opts {
 
 opts_t opts = { NULL, NULL, 50000, 100000 };
 
-static long total_paths;
-static long with_cycles;
+struct state {
+    long total_paths;
+    long with_cycles;
+    WINDOW *graph;
+    WINDOW *stats;
+};
+struct state state;
 
 void get_opts (int argc, char **argv);
 
@@ -51,9 +56,9 @@ void init_curses(void) {
 void init_board(graph_t *graph) {
     int r;
 
-    erase();
+    werase(state.graph);
     for (r=1; r <= graph->nr_rows; r++) {
-        mvaddnstr(r-1, 0, &graph->lines[r][1], graph->nr_cols);
+        mvwaddnstr(state.graph, r-1, 0, &graph->lines[r][1], graph->nr_cols);
     }
 }
 
@@ -65,8 +70,8 @@ void display_path (graph_t *graph, path_t *path) {
 
     attr_t attr_path    = A_STANDOUT;
     attr_t attr_curcell = A_STANDOUT;
-    total_paths++;
-    if (path->has_cycle) with_cycles++;
+    state.total_paths++;
+    if (path->has_cycle) state.with_cycles++;
 
     if (opts.cell_delay > 0) attr_curcell |= A_UNDERLINE;
 
@@ -77,30 +82,32 @@ void display_path (graph_t *graph, path_t *path) {
             prev->r = cell->r + (prev->r - cell->r)/2;
             prev->c = cell->c + (prev->c - cell->c)/2;
 
-            mvchgat(prev->r, prev->c, 1, attr_curcell, 0, NULL);
+            mvwchgat(state.graph, prev->r, prev->c, 1, attr_curcell, 0, NULL);
 
             if (opts.cell_delay > 0) {
-                refresh();
+                wrefresh(state.graph);
                 usleep(opts.cell_delay);
-                chgat(1, attr_path, 0, NULL);
+                wchgat(state.graph, 1, attr_path, 0, NULL);
             }
         }
 
-        mvchgat(cell->r, cell->c, 1, attr_curcell, 0, NULL);
+        mvwchgat(state.graph, cell->r, cell->c, 1, attr_curcell, 0, NULL);
 
         if (opts.cell_delay > 0) {
-            refresh();
+            wrefresh(state.graph);
             usleep(opts.cell_delay);
-            chgat(1, attr_path, 0, NULL);
+            wchgat(state.graph, 1, attr_path, 0, NULL);
         }
 
         prev = cell;
     }
 
     
-    snprintf(stat_line, 255, "Paths: %ld   With Cycles: %ld", total_paths, with_cycles);
-    mvaddstr(graph->nr_rows, 0, stat_line);
-    refresh();
+    snprintf(stat_line, 255, "Total Paths: %ld   Paths With Cycles: %ld", state.total_paths, state.with_cycles);
+    mvwaddstr(state.stats, 0, 0, stat_line);
+
+    wrefresh(state.graph);
+    wrefresh(state.stats);
 }
 
 int main (int argc, char **argv) {
@@ -125,6 +132,9 @@ int main (int argc, char **argv) {
     line_len = sizeof(char) * graph->word_len * 11 + 2;
     line = xzmalloc(line_len, '\0');
 
+    state.graph = newwin(graph->nr_rows, graph->nr_cols, 0, 0);
+    state.stats = newwin(1, 80, graph->nr_rows, 0);
+
     init_board(graph);
     opts.path_delay -= opts.cell_delay;
 
@@ -136,7 +146,7 @@ int main (int argc, char **argv) {
     }
 
     endwin();
-    printf("Paths: %ld  With Cycles: %ld\n", total_paths, with_cycles);
+    printf("Total Paths: %ld   Paths With Cycles: %ld\n", state.total_paths, state.with_cycles);
     return 0;
 }
 
