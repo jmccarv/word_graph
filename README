@@ -69,7 +69,7 @@ The top-left column of the graph is location row 0 column 0, displayed as [0,0]
 
 
 # Animate paths in terminal using curses
-./view_paths.sh ../data/level.dat ../data/level.dat
+./view_paths.sh ../data/level.dat
 
 # At maximum speed:
 ./view_paths.sh -d 0 -D 0 ../data/madamimadam.dat
