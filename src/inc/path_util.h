@@ -15,7 +15,7 @@ typedef struct path {
 
 
 /* Given a line of output from word_graph, like B[0,0]-O[0,2]-B[0-4]
- * populated the path structured pointed to by path
+ * populate the path structure pointed to by path
  *
  * Returns path (same as what is passed in)
  */

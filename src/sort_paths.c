@@ -69,9 +69,9 @@ int path_compare (const void *a, const void *b) {
         cb = pb->cells + i;
 
         if (ca->r < cb->r) return -1;
-        if (ca->r > cb->r) return 1;
+        if (ca->r > cb->r) return  1;
         if (ca->c < cb->c) return -1;
-        if (ca->c > cb->c) return 1;
+        if (ca->c > cb->c) return  1;
     }
 
     return 0;
