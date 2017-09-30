@@ -42,7 +42,7 @@ void usage (int rc) {
     exit(rc);
 }
 
-void init_curses(void) {
+void init_curses (void) {
     initscr();
     start_color();
     cbreak();
@@ -53,7 +53,7 @@ void init_curses(void) {
     curs_set(0);
 }
 
-void init_board(graph_t *graph) {
+void init_board (graph_t *graph) {
     int r;
 
     werase(state.graph);
