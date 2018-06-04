@@ -28,9 +28,10 @@ void graph_add_line (graph_t *graph, char *line) {
     graph->lines[graph->nr_lines++] = line;
 }
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 1023
 graph_t *parse_graph (FILE *fh, const char *word) {
-    char buf[BUF_SIZE];
+    char _buf[BUF_SIZE+1];
+    char *buf = _buf;
     char *p;
     char *delim;
     int  len = 0;
@@ -42,6 +43,10 @@ graph_t *parse_graph (FILE *fh, const char *word) {
     char *empty_line = NULL;
 
     graph_t *graph = xzmalloc(sizeof(graph_t), '\0');
+
+    // prevent the trim trailing spaces loop from backtracking too far
+    buf[0] = '\0';
+    buf++;
 
     while (fgets(buf, BUF_SIZE, fh)) {
         ++line;
