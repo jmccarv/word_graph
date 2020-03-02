@@ -116,23 +116,24 @@ func newGraph(fh io.Reader, word string) graph {
 func (g *graph) findPaths(printPaths bool) {
 	found := 0
 
-	nr := runtime.GOMAXPROCS(0)
-	if nr < len(g.nodes) {
-		nr = len(g.nodes)
-	}
-	chPathBucket := make(chan path, nr)
-	for i := 0; i < nr; i++ {
+	// Create a 'bucket' of paths we can reuse instead of constantly
+	// allocating (and freeing) new ones
+	chPathBucket := make(chan path, runtime.GOMAXPROCS(0))
+	for i := 0; i < runtime.GOMAXPROCS(0); i++ {
 		chPathBucket <- path(make([]*node, len(g.word)))
 	}
 
+	// Channel for paths to be printed when printPaths is true
 	pch := make(chan path)
 	var ch chan path
 	if printPaths {
 		ch = pch
 	}
 
+	// Channel to write the count of found paths from each worker goroutine
 	nch := make(chan int)
 
+	// Spawn worker goroutines to search for paths in the graph
 	var wg sync.WaitGroup
 	for _, n := range g.nodes {
 		if n.letter != g.word[0] {
@@ -151,9 +152,11 @@ func (g *graph) findPaths(printPaths bool) {
 
 	go func() {
 		wg.Wait()
+		// workers are done, close the pth channel to signal search completion
 		close(pch)
 	}()
 
+	// Spawn workers to retrieve and print found paths when printPaths is true
 	go func() {
 		var wg sync.WaitGroup
 		out := make(chan string)
@@ -171,15 +174,21 @@ func (g *graph) findPaths(printPaths bool) {
 
 		go func() {
 			wg.Wait()
+			// workers are done, so searching and listing is complete
+			// close our out channel to signal this completion
 			close(out)
 		}()
 
 		for s := range out {
 			fmt.Println(s)
 		}
+
+		// And finally we're done outputting paths, so we can close the nch
+		// channel to signal the main routine to exit
 		close(nch)
 	}()
 
+	// Receive path counts and accumulate a total
 	for n := range nch {
 		found += n
 	}
@@ -200,6 +209,7 @@ func (g *graph) search(ch, chPathBucket chan path, n *node, p path, ofs int) int
 		p[ofs] = e
 
 		if ofs+1 == len(g.word) {
+			// we found a path
 			if ch != nil {
 				pc := <-chPathBucket
 				copy(pc, p)
