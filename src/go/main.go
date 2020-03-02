@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -113,16 +115,25 @@ func newGraph(fh io.Reader, word string) graph {
 
 func (g *graph) findPaths(printPaths bool) {
 	found := 0
-	var wg sync.WaitGroup
+
+	nr := runtime.GOMAXPROCS(0)
+	if nr < len(g.nodes) {
+		nr = len(g.nodes)
+	}
+	chPathBucket := make(chan path, nr)
+	for i := 0; i < nr; i++ {
+		chPathBucket <- path(make([]*node, len(g.word)))
+	}
 
 	pch := make(chan path)
-	nch := make(chan int)
-
 	var ch chan path
 	if printPaths {
 		ch = pch
 	}
 
+	nch := make(chan int)
+
+	var wg sync.WaitGroup
 	for _, n := range g.nodes {
 		if n.letter != g.word[0] {
 			continue
@@ -132,7 +143,7 @@ func (g *graph) findPaths(printPaths bool) {
 		go func(n *node) {
 			p := path(make([]*node, len(g.word)))
 			p[0] = n
-			nr := g.search(ch, n, p, 1)
+			nr := g.search(ch, chPathBucket, n, p, 1)
 			nch <- nr
 			wg.Done()
 		}(n)
@@ -144,8 +155,27 @@ func (g *graph) findPaths(printPaths bool) {
 	}()
 
 	go func() {
-		for p := range pch {
-			fmt.Println(p)
+		var wg sync.WaitGroup
+		out := make(chan string)
+
+		for i := 0; i < runtime.GOMAXPROCS(0); i++ {
+			wg.Add(1)
+			go func() {
+				for p := range pch {
+					out <- p.String()
+					chPathBucket <- p
+				}
+				wg.Done()
+			}()
+		}
+
+		go func() {
+			wg.Wait()
+			close(out)
+		}()
+
+		for s := range out {
+			fmt.Println(s)
 		}
 		close(nch)
 	}()
@@ -159,7 +189,7 @@ func (g *graph) findPaths(printPaths bool) {
 	}
 }
 
-func (g *graph) search(ch chan path, n *node, p path, ofs int) int {
+func (g *graph) search(ch, chPathBucket chan path, n *node, p path, ofs int) int {
 	nr := 0
 
 	for _, e := range n.edges {
@@ -171,13 +201,15 @@ func (g *graph) search(ch chan path, n *node, p path, ofs int) int {
 
 		if ofs+1 == len(g.word) {
 			if ch != nil {
-				ch <- p.copy()
+				pc := <-chPathBucket
+				copy(pc, p)
+				ch <- pc
 			}
 			nr++
 			continue
 		}
 
-		nr += g.search(ch, e, p, ofs+1)
+		nr += g.search(ch, chPathBucket, e, p, ofs+1)
 	}
 
 	return nr
@@ -248,10 +280,6 @@ func (g graph) parseEdgeLine(r int, t string) {
 	}
 }
 
-func (n *node) String() string {
-	return fmt.Sprintf("%c[%v,%v]", n.letter, n.row, n.col)
-}
-
 func (g graph) dump() {
 	fmt.Printf("word=%v\n", g.word)
 
@@ -294,22 +322,28 @@ func (g graph) dump() {
 	}
 }
 
-func (p path) copy() path {
-	n := path(make([]*node, len(p)))
-	copy(n, p)
-	return n
+// strings.Builder is *much* faster than using fmt.Sprintf()
+func (n *node) String() string {
+	var s strings.Builder
+	s.WriteByte(n.letter)
+	s.WriteByte('[')
+	s.WriteString(strconv.Itoa(n.row))
+	s.WriteByte(',')
+	s.WriteString(strconv.Itoa(n.col))
+	s.WriteByte(']')
+	return s.String()
 }
 
 func (p path) String() string {
-	var s string
+	var s strings.Builder
 
 	for i := 0; i < len(p); i++ {
 		if i > 0 {
-			s = s + "-"
+			s.WriteString("-")
 		}
 		if p[i] != nil {
-			s = s + p[i].String()
+			s.WriteString(p[i].String())
 		}
 	}
-	return s
+	return s.String()
 }
