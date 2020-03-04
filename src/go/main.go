@@ -126,15 +126,12 @@ func (g *graph) findPaths(printPaths bool) {
 
 	// Channel for paths to be printed when printPaths is true
 	pch := make(chan path)
-	var ch chan path
-	if printPaths {
-		ch = pch
-	}
 
 	// Channel to write the count of found paths from each worker goroutine
 	nch := make(chan int)
 
 	// Spawn worker goroutines to search for paths in the graph
+	// One worker for each node that is a starting letter
 	var wg sync.WaitGroup
 	for _, n := range g.nodes {
 		if n.letter != g.word[0] {
@@ -145,7 +142,12 @@ func (g *graph) findPaths(printPaths bool) {
 		go func(n *node) {
 			p := path(make([]*node, len(g.word)))
 			p[0] = n
-			nr := g.search(ch, chPathBucket, n, p, 1)
+			var nr int
+			if printPaths {
+				nr = g.search(pch, chPathBucket, n, p, 1)
+			} else {
+				nr = g.search(nil, chPathBucket, n, p, 1)
+			}
 			nch <- nr
 			wg.Done()
 		}(n)
@@ -157,13 +159,14 @@ func (g *graph) findPaths(printPaths bool) {
 		close(pch)
 	}()
 
-	// Spawn workers to retrieve and print found paths when printPaths is true
+	// Spawn workers to receive and print found paths
 	go func() {
 		var wg sync.WaitGroup
 		out := make(chan string)
 
 		for i := 0; i < runtime.GOMAXPROCS(0); i++ {
 			wg.Add(1)
+			// receive paths, generate the string to output and pass it on
 			go func() {
 				for p := range pch {
 					out <- p.String()
@@ -180,6 +183,7 @@ func (g *graph) findPaths(printPaths bool) {
 			close(out)
 		}()
 
+		// receive and print path strings
 		for s := range out {
 			fmt.Println(s)
 		}
