@@ -80,14 +80,15 @@ func newGraph(fh io.Reader, word string) graph {
 	g := graph{word: word, nodes: make(map[rc]*node)}
 
 	for scanner.Scan() {
-		l := strings.TrimSpace(scanner.Text())
+		l := scanner.Text()
+		t := strings.TrimSpace(l)
 
 		// ignore empty lines and comments
-		if len(l) == 0 || l[0] == '#' {
+		if len(t) == 0 || t[0] == '#' {
 			continue
 		}
 
-		if a := strings.SplitN(l, "=", 2); len(a) > 1 {
+		if a := strings.SplitN(t, "=", 2); len(a) > 1 {
 			g.processAssignment(a)
 			continue
 		}

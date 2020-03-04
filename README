@@ -29,8 +29,11 @@ Take even a simple example like this:
 There are 32 different paths that can be taken to spell 'BOB'. These paths
 can be found and listed with this program. Try this:
 
-cd src
+cd src/c
 make
+cd src/go
+./build/sh
+
 ./word_graph -l ../data/bob.dat 
 B[0,0]-O[0,2]-B[0,0]
 B[0,0]-O[0,2]-B[0,4]
