@@ -242,6 +242,10 @@ func (g *graph) processAssignment(a []string) {
 	}
 }
 
+func (g *graph) nodeAt(r, c int) *node {
+	return g.nodes[rc{r, c}]
+}
+
 func (g *graph) parseNodeLine(r int, t string) {
 	if len(t) > len(g.word)*2-1 {
 		log.Fatalf("[%v]: Line too long for word '%v'", r, g.word)
@@ -256,8 +260,8 @@ func (g *graph) parseNodeLine(r int, t string) {
 		n := &node{letter: t[c], row: r, col: c}
 
 		if c > 0 && t[c-1] == '-' {
-			p, ok := g.nodes[rc{r, c - 2}]
-			if !ok {
+			p := g.nodeAt(r, c-2)
+			if p == nil {
 				log.Fatalf("[%v][%v]: Invalid edge '%c'", r, c-1, t[c-1])
 			}
 			p.edges = append(p.edges, n)
@@ -277,14 +281,14 @@ func (g graph) parseEdgeLine(r int, t string) {
 
 		switch t[c] {
 		case '\\':
-			n1 = g.nodes[rc{r - 1, c - 1}]
-			n2 = g.nodes[rc{r + 1, c + 1}]
+			n1 = g.nodeAt(r-1, c-1)
+			n2 = g.nodeAt(r+1, c+1)
 		case '/':
-			n1 = g.nodes[rc{r - 1, c + 1}]
-			n2 = g.nodes[rc{r + 1, c - 1}]
+			n1 = g.nodeAt(r-1, c+1)
+			n2 = g.nodeAt(r+1, c-1)
 		case '|':
-			n1 = g.nodes[rc{r - 1, c}]
-			n2 = g.nodes[rc{r + 1, c}]
+			n1 = g.nodeAt(r-1, c)
+			n2 = g.nodeAt(r+1, c)
 		}
 
 		if n1 != nil && n2 != nil {
