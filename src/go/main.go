@@ -164,6 +164,9 @@ func (g *graph) findPaths(printPaths bool) {
 		var wg sync.WaitGroup
 		out := make(chan string)
 
+		w := bufio.NewWriter(os.Stdout)
+		defer w.Flush()
+
 		for i := 0; i < runtime.GOMAXPROCS(0); i++ {
 			wg.Add(1)
 			// receive paths, generate the string to output and pass it on
@@ -185,7 +188,7 @@ func (g *graph) findPaths(printPaths bool) {
 
 		// receive and print path strings
 		for s := range out {
-			fmt.Println(s)
+			fmt.Fprintln(w, s)
 		}
 
 		// And finally we're done outputting paths, so we can close the nch

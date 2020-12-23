@@ -1,7 +1,7 @@
 # ---- Compiling ---- #
 
 # Optimization
-CFLAGS += -O2
+CFLAGS += -O3
 
 
 # ---- Linking ---- #
